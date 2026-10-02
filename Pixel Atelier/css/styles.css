@@ -512,7 +512,7 @@ body {
   color: #696c65;
 }
 
-.dimension-control > label {
+.dimension-control>label {
   display: block;
   margin: 16px 0 8px;
   color: #767971;
@@ -540,7 +540,7 @@ body {
   border-color: #c5b4a0;
 }
 
-.select-wrap > span {
+.select-wrap>span {
   position: absolute;
   right: 11px;
   top: 8px;
@@ -571,38 +571,6 @@ body {
   text-decoration: underline;
 }
 
-.quick-sizes {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 17px;
-}
-
-.quick-sizes > span {
-  color: #a0a198;
-  font: 9px var(--mono);
-  letter-spacing: 0.8px;
-}
-
-.quick-sizes div {
-  display: flex;
-  gap: 4px;
-}
-
-.quick-sizes button {
-  border: 1px solid #e9e7df;
-  background: transparent;
-  border-radius: 3px;
-  color: #82857e;
-  font: 9px var(--mono);
-  padding: 4px 7px;
-  cursor: pointer;
-}
-
-.quick-sizes button:hover {
-  background: #f1efe8;
-  color: #393b35;
-}
 
 .sidebar-note {
   position: absolute;
@@ -1570,7 +1538,6 @@ body,
 .tip-card,
 .tip-key,
 .export-button,
-.quick-sizes button,
 .text-button,
 .tip-card button,
 .swatch-color-field input,
@@ -1615,9 +1582,8 @@ body,
 :root[data-theme="dark"] .tool-button,
 :root[data-theme="dark"] .custom-color,
 :root[data-theme="dark"] .current-color-row,
-:root[data-theme="dark"] .dimension-control > label,
+:root[data-theme="dark"] .dimension-control>label,
 :root[data-theme="dark"] .dimension-meta,
-:root[data-theme="dark"] .quick-sizes > span,
 :root[data-theme="dark"] .sidebar-note,
 :root[data-theme="dark"] .document-name,
 :root[data-theme="dark"] .document-name input,
@@ -1652,9 +1618,7 @@ body,
 
 :root[data-theme="dark"] .tool-button:hover,
 :root[data-theme="dark"] .icon-button:hover:not(:disabled),
-:root[data-theme="dark"] .quick-sizes button:hover {
-  background: var(--surface-hover);
-}
+
 
 :root[data-theme="dark"] .tool-button.active {
   color: var(--ink);
@@ -1663,7 +1627,7 @@ body,
 
 :root[data-theme="dark"] .tool-button .tool-icon,
 :root[data-theme="dark"] .tool-button kbd,
-:root[data-theme="dark"] .select-wrap > span,
+:root[data-theme="dark"] .select-wrap>span,
 :root[data-theme="dark"] .current-color-row code,
 :root[data-theme="dark"] .input-pair b {
   color: var(--text-muted);
@@ -1701,7 +1665,6 @@ body,
   border-color: #bd8a73;
 }
 
-:root[data-theme="dark"] .quick-sizes button,
 :root[data-theme="dark"] .fit-button,
 :root[data-theme="dark"] .tip-key {
   color: var(--text-secondary);
@@ -1780,6 +1743,7 @@ body,
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

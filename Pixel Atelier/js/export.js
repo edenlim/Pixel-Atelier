@@ -94,13 +94,31 @@ function exportArtwork(format) {
 
 export function setupExport() {
   const exportDialog = $("#exportDialog");
+  const exportHint = $("#exportHint");
+  const formatOptions = document.querySelectorAll(
+    'input[name="exportFormatChoice"]',
+  );
   let selectedFormat = "svg";
+
+  function updateExportHint(format) {
+    exportHint.textContent =
+      format === "png"
+        ? "PNG downloads at your canvas size and keeps empty pixels transparent."
+        : "SVG stays sharp at any size and keeps empty pixels transparent.";
+  }
+
+  formatOptions.forEach((option) => {
+    option.addEventListener("change", () => {
+      updateExportHint(option.value);
+    });
+  });
 
   $("#exportBtn").addEventListener("click", () => {
     const selectedOption = document.querySelector(
       `input[name="exportFormatChoice"][value="${selectedFormat}"]`,
     );
     if (selectedOption) selectedOption.checked = true;
+    updateExportHint(selectedFormat);
     exportDialog.showModal();
   });
 

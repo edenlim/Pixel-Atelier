@@ -6,15 +6,6 @@ import { $, showToast } from "./utils.js";
 //------- DIMENSION DISPLAY -------
 
 function updateSizeControls() {
-  const standardSizes = [8, 16, 24, 32];
-  const select = $("#dimensionSelect");
-
-  if (state.width === state.height && standardSizes.includes(state.width)) {
-    select.value = `${state.width} × ${state.height}`;
-  } else {
-    select.value = "custom";
-  }
-
   $("#widthInput").value = state.width;
   $("#heightInput").value = state.height;
   $("#infoDimensions").textContent = `${state.width} × ${state.height}`;
@@ -218,25 +209,6 @@ function setupResizeModeOptions() {
 export function setupResizeControls() {
   const resizeDialog = $("#resizeDialog");
   const customDialog = $("#customDialog");
-
-  $("#dimensionSelect").addEventListener("change", (event) => {
-    if (event.target.value === "custom") {
-      $("#customWidth").value = state.width;
-      $("#customHeight").value = state.height;
-      customDialog.showModal();
-      return;
-    }
-
-    const size = Number.parseInt(event.target.value, 10);
-    openResizeDialog(size, size);
-  });
-
-  document.querySelectorAll("[data-size]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const size = Number(button.dataset.size);
-      openResizeDialog(size, size);
-    });
-  });
 
   $("#resizeBtn").addEventListener("click", () => openResizeDialog());
   $("#resizeTipBtn").addEventListener("click", () => openResizeDialog());
