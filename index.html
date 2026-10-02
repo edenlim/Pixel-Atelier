@@ -20,7 +20,8 @@
       href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
   </head>
   <body>
     <div class="app-shell">
@@ -84,8 +85,8 @@
             </svg>
           </button>
           <span class="top-divider"></span>
-          <button class="export-button" id="exportBtn">
-            <span>↓</span> Export SVG
+          <button class="export-button" id="exportBtn" type="button">
+            <span>↓</span> Export
           </button>
         </div>
       </header>
@@ -126,7 +127,7 @@
 
           <div class="section-rule"></div>
           <div class="section-heading">
-            <span>COLOURS</span>
+            <span>COLORS</span>
             <button
               id="paletteAction"
               class="palette-action"
@@ -138,12 +139,12 @@
           </div>
           <div class="swatches" id="swatches"></div>
           <label class="custom-color"
-            ><span class="color-wheel">◉</span><span>Custom colour</span
+            ><span class="color-wheel">◉</span><span>Custom color</span
             ><input
               id="customColor"
               type="color"
               value="#ee7863"
-              aria-label="Choose custom colour"
+              aria-label="Choose custom color"
           /></label>
           <div class="current-color-row">
             <span>Current</span
@@ -222,8 +223,11 @@
               </div>
             </div>
             <div class="stage-tip">
-              <span class="tip-key">⌘</span> + <span class="tip-key">Z</span> to
-              undo <span class="tip-separator">·</span> Drag to draw
+              <span class="desktop-stage-tip">
+                <span class="tip-key">⌘</span> + <span class="tip-key">Z</span>
+                to undo <span class="tip-separator">·</span> Drag to draw
+              </span>
+              <span class="mobile-stage-tip">Drag to draw · Pinch to zoom</span>
             </div>
           </div>
           <footer class="canvas-footer">
@@ -276,139 +280,17 @@
             </div>
           </div>
           <div class="right-bottom">
-            <span class="keyboard-icon">⌨</span
-            ><span>Made for the joy of making</span><span class="heart">♥</span>
+            <div class="creator-links">
+              <span>Made by: Edenlim</span>
+              <button id="changelogBtn" type="button">Changelogs</button>
+            </div>
+            <span class="app-version">v0.0.1</span>
           </div>
         </aside>
       </main>
     </div>
 
-    <dialog id="resizeDialog" class="modal">
-      <form method="dialog" class="modal-close-form">
-        <button class="modal-close" aria-label="Close">×</button>
-      </form>
-      <div class="modal-kicker"><span>CANVAS SETTINGS</span><span>✳</span></div>
-      <h2>Make room for<br /><em>more pixels.</em></h2>
-      <p class="modal-description">
-        Choose a new canvas size and decide how your artwork should adapt.
-      </p>
-      <label class="modal-field"
-        >New dimensions
-        <span class="input-pair"
-          ><input
-            id="widthInput"
-            type="number"
-            min="1"
-            max="128"
-            value="32"
-            aria-label="New width" /><b>×</b
-          ><input
-            id="heightInput"
-            type="number"
-            min="1"
-            max="128"
-            value="32"
-            aria-label="New height" /><button
-            id="aspectRatioLock"
-            class="aspect-ratio-lock is-locked"
-            type="button"
-            aria-label="Unlock aspect ratio"
-            aria-pressed="true"
-            title="Unlock aspect ratio"
-            ><svg class="lock-icon lock-icon-closed" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><svg class="lock-icon lock-icon-open" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 7-2"/></svg></button></span
-      ></label>
-      <div class="resize-options">
-        <label class="resize-option selected"
-          ><input type="radio" name="resizeMode" value="expand" checked /><span
-            class="option-art expand-art"
-            ><i></i><i></i><i></i><i></i></span
-          ><span class="option-copy"
-            ><strong>Expand canvas</strong
-            ><small>Keep every pixel its original size</small></span
-          ><span class="radio-mark"></span
-        ></label>
-        <label class="resize-option"
-          ><input type="radio" name="resizeMode" value="scale" /><span
-            class="option-art scale-art"
-            ><i></i><i></i><i></i><i></i></span
-          ><span class="option-copy"
-            ><strong>Scale artwork</strong
-            ><small>Resize your art to fill the new canvas</small></span
-          ><span class="radio-mark"></span
-        ></label>
-      </div>
-      <div class="modal-hint">
-        <span>✦</span
-        ><span id="resizeHint"
-          >Your drawing stays the same size, with extra room around it.</span
-        >
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="cancel-button" id="cancelResize">
-          Cancel</button
-        ><button type="button" class="apply-button" id="applyResize">
-          Apply new size <span>→</span>
-        </button>
-      </div>
-    </dialog>
-
-    <dialog id="customDialog" class="modal compact-modal">
-      <form method="dialog" class="modal-close-form">
-        <button class="modal-close" aria-label="Close">×</button>
-      </form>
-      <div class="modal-kicker"><span>CANVAS SETTINGS</span><span>✳</span></div>
-      <h2>Set your <em>canvas.</em></h2>
-      <p class="modal-description">
-        Choose any dimensions from 1 to 128 pixels.
-      </p>
-      <label class="modal-field"
-        >Dimensions
-        <span class="input-pair"
-          ><input
-            id="customWidth"
-            type="number"
-            min="1"
-            max="128"
-            value="16"
-            aria-label="Canvas width" /><b>×</b
-          ><input
-            id="customHeight"
-            type="number"
-            min="1"
-            max="128"
-            value="16"
-            aria-label="Canvas height" /></span
-      ></label>
-      <div class="modal-actions">
-        <button type="button" class="cancel-button" id="cancelCustom">
-          Cancel</button
-        ><button type="button" class="apply-button" id="applyCustom">
-          Create canvas <span>→</span>
-        </button>
-      </div>
-    </dialog>
-
-    <dialog id="colorDialog" class="modal">
-      <div class="modal-kicker"><span>ADD TO PALETTE</span><span>✳</span></div>
-      <h2>Choose a <em>colour.</em></h2>
-      <p class="modal-description">
-        Pick a colour for a new swatch in your palette.
-      </p>
-
-      <div class="swatch-color-field">
-        <label for="swatchColorPicker">Swatch colour</label>
-        <input id="swatchColorPicker" type="color" value="#ee7863" />
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="cancel-button" id="cancelColor">
-          Cancel
-        </button>
-        <button type="button" class="apply-button" id="confirmColor">
-          Confirm <span>→</span>
-        </button>
-      </div>
-    </dialog>
+    <div id="dialogContainer"></div>
 
     <input
       id="colorFile"

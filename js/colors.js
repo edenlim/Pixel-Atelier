@@ -123,11 +123,15 @@ function createAddSwatchButton() {
 function setupAddSwatchDialog() {
   const dialog = $("#colorDialog");
   const colorPicker = $("#swatchColorPicker");
+  const heading = $("#choose-color-text");
+
+  colorPicker.addEventListener("input", () => {
+    heading.style.color = colorPicker.value;
+  });
 
   $("#confirmColor").addEventListener("click", () => {
     const color = colorPicker.value.toLowerCase();
     const swatch = addSwatch(color, { isCustom: true, isRemovable: true });
-
     savePalette();
     setColor(color);
     exitEditMode();
@@ -140,7 +144,11 @@ function setupAddSwatchDialog() {
 
 function openAddSwatchDialog() {
   if (editing) return;
-  $("#swatchColorPicker").value = state.color;
+
+  const colorPicker = $("#swatchColorPicker");
+  colorPicker.value = state.color;
+  $("#choose-color-text").style.color = colorPicker.value;
+
   $("#colorDialog").showModal();
 }
 
