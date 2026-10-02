@@ -104,7 +104,6 @@ export function setupExport() {
     exportDialog.showModal();
   });
 
-  $("#cancelExport").addEventListener("click", () => exportDialog.close());
   $("#confirmExport").addEventListener("click", () => {
     const formatOption = document.querySelector(
       `input[name="exportFormatChoice"]:checked`,
