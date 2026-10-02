@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f4f2ec" />
+    <title>Pixel Atelier — Pixel Art Editor</title>
+    <script>
+      try {
+        if (localStorage.getItem("pixel-atelier-theme") === "dark") {
+          document.documentElement.dataset.theme = "dark";
+        }
+      } catch {
+        // The page uses the light theme when browser storage is unavailable.
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="Pixel Atelier home">
+          <span class="brand-mark" aria-hidden="true"
+            ><i></i><i></i><i></i><i></i
+          ></span>
+          <span>pixel<span class="brand-light">atelier</span></span>
+        </a>
+        <div class="topbar-center">
+          <span class="status-dot"></span
+          ><span id="saveStatus">All changes saved</span>
+        </div>
+        <div class="topbar-actions">
+          <button
+            class="icon-button"
+            id="undoBtn"
+            title="Undo (⌘Z)"
+            aria-label="Undo"
+            disabled
+          >
+            ↶
+          </button>
+          <button
+            class="icon-button"
+            id="redoBtn"
+            title="Redo (⌘⇧Z)"
+            aria-label="Redo"
+            disabled
+          >
+            ↷
+          </button>
+          <span class="top-divider"></span>
+          <button
+            class="theme-toggle"
+            id="themeToggle"
+            type="button"
+            aria-label="Switch to dark mode"
+            aria-pressed="false"
+            title="Switch to dark mode"
+          >
+            <svg
+              class="theme-icon theme-icon-moon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                d="M20.2 15.1A8.4 8.4 0 0 1 8.9 3.8 8.5 8.5 0 1 0 20.2 15.1Z"
+              />
+            </svg>
+            <svg
+              class="theme-icon theme-icon-sun"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path
+                d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"
+              />
+            </svg>
+          </button>
+          <span class="top-divider"></span>
+          <button class="export-button" id="exportBtn">
+            <span>↓</span> Export SVG
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="sidebar left-sidebar">
+          <div class="sidebar-heading">
+            <span>TOOLBOX</span><span class="tiny-label">01</span>
+          </div>
+          <div class="tool-list" role="group" aria-label="Drawing tools">
+            <button
+              class="tool-button active"
+              data-tool="pencil"
+              title="Pencil (B)"
+            >
+              <span class="tool-icon">✎</span><span>Pencil</span><kbd>B</kbd>
+            </button>
+            <button class="tool-button" data-tool="eraser" title="Eraser (E)">
+              <span class="tool-icon">▱</span><span>Eraser</span><kbd>E</kbd>
+            </button>
+            <button
+              class="tool-button"
+              data-tool="bucket"
+              title="Fill bucket (G)"
+            >
+              <span class="tool-icon">◩</span><span>Fill bucket</span
+              ><kbd>G</kbd>
+            </button>
+            <button
+              class="tool-button"
+              data-tool="eyedropper"
+              title="Eyedropper (I)"
+            >
+              <span class="tool-icon">⌕</span><span>Eyedropper</span
+              ><kbd>I</kbd>
+            </button>
+          </div>
+
+          <div class="section-rule"></div>
+          <div class="section-heading">
+            <span>COLOURS</span>
+            <button
+              id="paletteAction"
+              class="palette-action"
+              type="button"
+              aria-label="Edit custom swatches"
+            >
+              Edit
+            </button>
+          </div>
+          <div class="swatches" id="swatches"></div>
+          <label class="custom-color"
+            ><span class="color-wheel">◉</span><span>Custom colour</span
+            ><input
+              id="customColor"
+              type="color"
+              value="#ee7863"
+              aria-label="Choose custom colour"
+          /></label>
+          <div class="current-color-row">
+            <span>Current</span
+            ><span class="current-chip" id="currentChip"></span
+            ><code id="currentHex">#EE7863</code>
+          </div>
+
+          <div class="section-rule"></div>
+          <div class="sidebar-heading">
+            <span>CANVAS</span><span class="tiny-label">02</span>
+          </div>
+          <div class="dimension-control">
+            <label for="dimensionSelect">Grid size</label>
+            <div class="select-wrap">
+              <select id="dimensionSelect">
+                <option>8 × 8</option>
+                <option selected>16 × 16</option>
+                <option>24 × 24</option>
+                <option>32 × 32</option>
+                <option value="custom">Custom…</option></select
+              ><span>⌄</span>
+            </div>
+            <div class="dimension-meta">
+              <span id="dimensionMeta">256 pixels</span
+              ><button id="resizeBtn" class="text-button">
+                Resize options
+              </button>
+            </div>
+          </div>
+          <div class="quick-sizes">
+            <span>QUICK SET</span>
+            <div>
+              <button data-size="16">16</button
+              ><button data-size="24">24</button
+              ><button data-size="32">32</button>
+            </div>
+          </div>
+
+          <div class="sidebar-note">
+            <span class="note-spark">✳</span>
+            <p>Every empty cell stays transparent in your exported SVG.</p>
+          </div>
+        </aside>
+
+        <section class="canvas-area" aria-label="Drawing workspace">
+          <div class="canvas-toolbar">
+            <div class="document-name">
+              <span class="file-icon">▦</span
+              ><input
+                id="artName"
+                value="Untitled pixel art"
+                aria-label="Artwork name"
+              /><span class="edit-icon">✎</span>
+            </div>
+            <div class="canvas-tools">
+              <button id="gridToggle" class="toggle-button on">
+                <span class="toggle-track"><i></i></span>Grid</button
+              ><span class="toolbar-sep"></span
+              ><button id="zoomOut" class="zoom-button" aria-label="Zoom out">
+                −</button
+              ><span id="zoomLabel" class="zoom-label">100%</span
+              ><button id="zoomIn" class="zoom-button" aria-label="Zoom in">
+                +</button
+              ><button id="fitBtn" class="fit-button">Fit</button>
+            </div>
+          </div>
+          <div class="canvas-stage" id="canvasStage">
+            <div class="canvas-card">
+              <div class="canvas-coordinate top-coord" id="topCoords"></div>
+              <div class="canvas-coordinate left-coord" id="leftCoords"></div>
+              <div class="pixel-canvas-wrap" id="canvasWrap">
+                <canvas
+                  id="pixelCanvas"
+                  aria-label="Pixel art drawing canvas"
+                ></canvas>
+              </div>
+            </div>
+            <div class="stage-tip">
+              <span class="tip-key">⌘</span> + <span class="tip-key">Z</span> to
+              undo <span class="tip-separator">·</span> Drag to draw
+            </div>
+          </div>
+          <footer class="canvas-footer">
+            <div>
+              <span class="footer-dot"></span
+              ><span id="toolStatus">Pencil tool</span>
+            </div>
+            <span id="cursorStatus">— , —</span
+            ><span id="canvasInfo">16 × 16 px</span>
+          </footer>
+        </section>
+
+        <aside class="sidebar right-sidebar">
+          <div class="sidebar-heading">
+            <span>PREVIEW</span
+            ><span class="tiny-label live-label"><i></i> LIVE</span>
+          </div>
+          <div class="preview-frame">
+            <div class="preview-checker">
+              <canvas id="previewCanvas"></canvas>
+            </div>
+            <span class="preview-caption">Your art, at a glance</span>
+          </div>
+          <div class="section-rule"></div>
+          <div class="sidebar-heading"><span>PIXEL INFO</span></div>
+          <div class="info-list">
+            <div>
+              <span>Dimensions</span
+              ><strong id="infoDimensions">16 × 16</strong>
+            </div>
+            <div>
+              <span>Painted pixels</span><strong id="paintedCount">0</strong>
+            </div>
+            <div>
+              <span>Current tool</span><strong id="infoTool">Pencil</strong>
+            </div>
+          </div>
+          <div class="section-rule"></div>
+          <div class="tip-card">
+            <span class="tip-card-icon">↗</span>
+            <div>
+              <strong>Resize your canvas</strong>
+              <p>
+                Keep your art the same size, or scale it up to fill a bigger
+                grid.
+              </p>
+              <button id="resizeTipBtn">
+                Explore resize options <span>→</span>
+              </button>
+            </div>
+          </div>
+          <div class="right-bottom">
+            <span class="keyboard-icon">⌨</span
+            ><span>Made for the joy of making</span><span class="heart">♥</span>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <dialog id="resizeDialog" class="modal">
+      <form method="dialog" class="modal-close-form">
+        <button class="modal-close" aria-label="Close">×</button>
+      </form>
+      <div class="modal-kicker"><span>CANVAS SETTINGS</span><span>✳</span></div>
+      <h2>Make room for<br /><em>more pixels.</em></h2>
+      <p class="modal-description">
+        Choose a new canvas size and decide how your artwork should adapt.
+      </p>
+      <label class="modal-field"
+        >New dimensions
+        <span class="input-pair"
+          ><input
+            id="widthInput"
+            type="number"
+            min="1"
+            max="128"
+            value="32"
+            aria-label="New width" /><b>×</b
+          ><input
+            id="heightInput"
+            type="number"
+            min="1"
+            max="128"
+            value="32"
+            aria-label="New height" /><button
+            id="aspectRatioLock"
+            class="aspect-ratio-lock is-locked"
+            type="button"
+            aria-label="Unlock aspect ratio"
+            aria-pressed="true"
+            title="Unlock aspect ratio"
+            ><svg class="lock-icon lock-icon-closed" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><svg class="lock-icon lock-icon-open" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 7-2"/></svg></button></span
+      ></label>
+      <div class="resize-options">
+        <label class="resize-option selected"
+          ><input type="radio" name="resizeMode" value="expand" checked /><span
+            class="option-art expand-art"
+            ><i></i><i></i><i></i><i></i></span
+          ><span class="option-copy"
+            ><strong>Expand canvas</strong
+            ><small>Keep every pixel its original size</small></span
+          ><span class="radio-mark"></span
+        ></label>
+        <label class="resize-option"
+          ><input type="radio" name="resizeMode" value="scale" /><span
+            class="option-art scale-art"
+            ><i></i><i></i><i></i><i></i></span
+          ><span class="option-copy"
+            ><strong>Scale artwork</strong
+            ><small>Resize your art to fill the new canvas</small></span
+          ><span class="radio-mark"></span
+        ></label>
+      </div>
+      <div class="modal-hint">
+        <span>✦</span
+        ><span id="resizeHint"
+          >Your drawing stays the same size, with extra room around it.</span
+        >
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="cancel-button" id="cancelResize">
+          Cancel</button
+        ><button type="button" class="apply-button" id="applyResize">
+          Apply new size <span>→</span>
+        </button>
+      </div>
+    </dialog>
+
+    <dialog id="customDialog" class="modal compact-modal">
+      <form method="dialog" class="modal-close-form">
+        <button class="modal-close" aria-label="Close">×</button>
+      </form>
+      <div class="modal-kicker"><span>CANVAS SETTINGS</span><span>✳</span></div>
+      <h2>Set your <em>canvas.</em></h2>
+      <p class="modal-description">
+        Choose any dimensions from 1 to 128 pixels.
+      </p>
+      <label class="modal-field"
+        >Dimensions
+        <span class="input-pair"
+          ><input
+            id="customWidth"
+            type="number"
+            min="1"
+            max="128"
+            value="16"
+            aria-label="Canvas width" /><b>×</b
+          ><input
+            id="customHeight"
+            type="number"
+            min="1"
+            max="128"
+            value="16"
+            aria-label="Canvas height" /></span
+      ></label>
+      <div class="modal-actions">
+        <button type="button" class="cancel-button" id="cancelCustom">
+          Cancel</button
+        ><button type="button" class="apply-button" id="applyCustom">
+          Create canvas <span>→</span>
+        </button>
+      </div>
+    </dialog>
+
+    <dialog id="colorDialog" class="modal">
+      <div class="modal-kicker"><span>ADD TO PALETTE</span><span>✳</span></div>
+      <h2>Choose a <em>colour.</em></h2>
+      <p class="modal-description">
+        Pick a colour for a new swatch in your palette.
+      </p>
+
+      <div class="swatch-color-field">
+        <label for="swatchColorPicker">Swatch colour</label>
+        <input id="swatchColorPicker" type="color" value="#ee7863" />
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="cancel-button" id="cancelColor">
+          Cancel
+        </button>
+        <button type="button" class="apply-button" id="confirmColor">
+          Confirm <span>→</span>
+        </button>
+      </div>
+    </dialog>
+
+    <input
+      id="colorFile"
+      type="color"
+      value="#ee7863"
+      tabindex="-1"
+      aria-hidden="true"
+    />
+    <div id="toast" class="toast" role="status"></div>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
