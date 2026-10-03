@@ -108,16 +108,28 @@ export function renderCanvas() {
   context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   context.clearRect(0, 0, rect.width, rect.height);
   context.imageSmoothingEnabled = false;
+
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  context.save();
+  context.translate(centerX + state.panX, centerY + state.panY);
+  context.scale(state.zoom, state.zoom);
+  context.translate(-centerX, -centerY);
   context.drawImage(artworkCanvas, 0, 0, rect.width, rect.height);
 
   const cellWidth = rect.width / state.width;
   const cellHeight = rect.height / state.height;
 
-  if (state.grid && cellWidth >= 4 && cellHeight >= 4) {
+  if (
+    state.grid &&
+    cellWidth * state.zoom >= 4 &&
+    cellHeight * state.zoom >= 4
+  ) {
     drawGrid(rect.width, rect.height, cellWidth, cellHeight);
   }
 
   drawSelectionOutline(cellWidth, cellHeight);
+  context.restore();
 
   renderPreview();
   updateCanvasInfo(paintedPixels);
@@ -205,22 +217,48 @@ function updateCanvasInfo(paintedPixels) {
 }
 
 function drawCoordinates() {
-  const dimensions = `${state.width}x${state.height}`;
+  const dimensions = [
+    state.width,
+    state.height,
+    state.zoom,
+    state.panX,
+    state.panY,
+    canvasWrap.clientWidth,
+    canvasWrap.clientHeight,
+  ].join(":");
   if (dimensions === renderedCoordinateDimensions) return;
 
   const top = $("#topCoords");
   const left = $("#leftCoords");
-  const xTicks = getCoordinateTicks(state.width);
-  const yTicks = getCoordinateTicks(state.height);
+  const xTicks = getVisibleCoordinateTicks(
+    state.width,
+    canvasWrap.clientWidth,
+    state.panX,
+  );
+  const yTicks = getVisibleCoordinateTicks(
+    state.height,
+    canvasWrap.clientHeight,
+    state.panY,
+  );
 
   top.replaceChildren(...xTicks.map(createCoordinate));
   left.replaceChildren(...yTicks.map(createCoordinate));
   renderedCoordinateDimensions = dimensions;
 }
 
-function getCoordinateTicks(size) {
-  const tick = size <= 16 ? Math.floor : Math.round;
-  return [0, tick(size / 4), tick(size / 2), tick((size * 3) / 4), size - 1];
+function getVisibleCoordinateTicks(size, viewportSize, panOffset) {
+  const fractions = [0, 0.25, 0.5, 0.75, 1];
+  const cellSize = viewportSize / size;
+  const viewportCenter = viewportSize / 2;
+
+  return fractions.map((fraction) => {
+    const screenPosition = fraction * viewportSize;
+    const artworkPosition =
+      (screenPosition - viewportCenter - panOffset) / state.zoom +
+      viewportCenter;
+    const pixel = Math.floor(artworkPosition / cellSize + 1e-8);
+    return pixel < 0 || pixel >= size ? "·" : pixel;
+  });
 }
 
 function createCoordinate(value) {

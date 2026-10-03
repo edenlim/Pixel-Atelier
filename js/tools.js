@@ -19,6 +19,7 @@ let pinchActive = false;
 let pinchStartDistance = 0;
 let pinchStartZoom = 1;
 let touchChangeInProgress = false;
+let moveGesture = null;
 
 //------- TOOL SELECTION -------
 
@@ -41,6 +42,7 @@ export function setTool(tool) {
     eraser: "cell",
     pencil: "crosshair",
     lasso: "crosshair",
+    move: "grab",
   };
   canvas.style.cursor = cursors[tool] || "crosshair";
   $("#toolStatus").textContent = `${formatToolName(tool)} tool`;
@@ -50,34 +52,27 @@ export function setTool(tool) {
 //------- POINTER-TO-PIXEL COORDINATES -------
 
 function getCellFromPointer(event) {
-  const bounds = canvas.getBoundingClientRect();
-  const x = clamp(
-    Math.floor(((event.clientX - bounds.left) / bounds.width) * state.width),
-    0,
-    state.width - 1,
-  );
-  const y = clamp(
-    Math.floor(((event.clientY - bounds.top) / bounds.height) * state.height),
-    0,
-    state.height - 1,
-  );
+  const point = getCanvasPointFromPointer(event);
+  const x = clamp(Math.floor(point.x), 0, state.width - 1);
+  const y = clamp(Math.floor(point.y), 0, state.height - 1);
 
   return { x, y, index: y * state.width + x };
 }
 
 function getCanvasPointFromPointer(event) {
   const bounds = canvas.getBoundingClientRect();
+  const centerX = bounds.width / 2;
+  const centerY = bounds.height / 2;
+  const localX = event.clientX - bounds.left;
+  const localY = event.clientY - bounds.top;
+  const artworkX =
+    (localX - centerX - state.panX) / state.zoom + centerX;
+  const artworkY =
+    (localY - centerY - state.panY) / state.zoom + centerY;
+
   return {
-    x: clamp(
-      ((event.clientX - bounds.left) / bounds.width) * state.width,
-      0,
-      state.width,
-    ),
-    y: clamp(
-      ((event.clientY - bounds.top) / bounds.height) * state.height,
-      0,
-      state.height,
-    ),
+    x: clamp((artworkX / bounds.width) * state.width, 0, state.width),
+    y: clamp((artworkY / bounds.height) * state.height, 0, state.height),
   };
 }
 
@@ -172,6 +167,8 @@ function getTouchDistance() {
 }
 
 function beginPinchZoom() {
+  moveGesture = null;
+  if (state.tool === "move") canvas.style.cursor = "grab";
   cancelLassoGesture();
   if (state.drawing || touchChangeInProgress) {
     stopDrawing();
@@ -224,6 +221,20 @@ export function setupTools() {
     }
 
     if (pinchActive) return;
+
+    if (state.tool === "move") {
+      moveGesture = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        panX: state.panX,
+        panY: state.panY,
+      };
+      canvas.setPointerCapture(event.pointerId);
+      canvas.style.cursor = "grabbing";
+      return;
+    }
+
     const cell = getCellFromPointer(event);
     updateCursorPosition(cell);
 
@@ -264,6 +275,13 @@ export function setupTools() {
       return;
     }
 
+    if (moveGesture?.pointerId === event.pointerId) {
+      state.panX = moveGesture.panX + event.clientX - moveGesture.startX;
+      state.panY = moveGesture.panY + event.clientY - moveGesture.startY;
+      renderCanvas();
+      return;
+    }
+
     const cell = getCellFromPointer(event);
     updateCursorPosition(cell);
 
@@ -291,6 +309,11 @@ export function setupTools() {
       }
       touchChangeInProgress = false;
     }
+    if (moveGesture?.pointerId === event.pointerId) {
+      moveGesture = null;
+      canvas.style.cursor = "grab";
+      return;
+    }
     finishLassoGesture(getCanvasPointFromPointer(event));
     stopDrawing();
   });
@@ -303,6 +326,10 @@ export function setupTools() {
         pinchActive = false;
         pinchStartDistance = 0;
       }
+    }
+    if (moveGesture?.pointerId === event.pointerId) {
+      moveGesture = null;
+      canvas.style.cursor = "grab";
     }
     cancelLassoGesture();
     stopDrawing();
