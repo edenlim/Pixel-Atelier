@@ -40,9 +40,36 @@ export function renderCanvas() {
     drawGrid(rect.width, rect.height, cellWidth, cellHeight);
   }
 
+  drawSelectionOutline(cellWidth, cellHeight);
+
   renderPreview();
   updateCanvasInfo();
   drawCoordinates();
+}
+
+function drawSelectionOutline(cellWidth, cellHeight) {
+  const points = state.selection?.points;
+  if (!points?.length) return;
+
+  context.save();
+  context.beginPath();
+  points.forEach((point, index) => {
+    const x = point.x * cellWidth;
+    const y = point.y * cellHeight;
+    if (index === 0) context.moveTo(x, y);
+    else context.lineTo(x, y);
+  });
+  context.closePath();
+  context.lineWidth = 1.5;
+  context.setLineDash([3, 2]);
+  context.lineDashOffset = 0;
+  context.strokeStyle =
+    document.documentElement.dataset.theme === "dark" ? "#ffffff" : "#292b26";
+  context.shadowColor =
+    document.documentElement.dataset.theme === "dark" ? "#292b26" : "#ffffff";
+  context.shadowBlur = 2;
+  context.stroke();
+  context.restore();
 }
 
 //------- GRID OVERLAY -------

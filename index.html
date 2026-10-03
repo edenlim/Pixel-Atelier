@@ -88,6 +88,9 @@
           <button class="export-button" id="exportBtn" type="button">
             <span>↓</span> Export
           </button>
+          <button class="import-button" id="importBtn" type="button">
+            <span>↑</span> Import
+          </button>
         </div>
       </header>
 
@@ -122,6 +125,15 @@
             >
               <span class="tool-icon">⌕</span><span>Eyedropper</span
               ><kbd>I</kbd>
+            </button>
+            <button class="tool-button" data-tool="lasso" title="Lasso (L)">
+              <span class="tool-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 5C4.7 5 3 7.4 3 10s1.7 5 5 5c3.7 0 7.2-8 10.5-8 1.8 0 2.5 1.2 2.5 2.5S20 12 18 12" />
+                  <path d="M8 15c1.5 3 4 4 7 4" />
+                </svg>
+              </span>
+              <span>Lasso</span><kbd>L</kbd>
             </button>
           </div>
 
@@ -266,7 +278,7 @@
               <span>Made by: Edenlim</span>
               <button id="changelogBtn" type="button">Changelogs</button>
             </div>
-            <span class="app-version">v0.0.2</span>
+            <span class="app-version">v0.0.3</span>
           </div>
         </aside>
       </main>
@@ -278,6 +290,13 @@
       id="colorFile"
       type="color"
       value="#ee7863"
+      tabindex="-1"
+      aria-hidden="true"
+    />
+    <input
+      id="importFile"
+      type="file"
+      accept="image/png,image/svg+xml,.png,.svg"
       tabindex="-1"
       aria-hidden="true"
     />

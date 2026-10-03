@@ -1,5 +1,5 @@
 import { undo, redo } from "./history.js";
-import { setTool } from "./tools.js";
+import { clearSelection, setTool } from "./tools.js";
 import { $ } from "./utils.js";
 
 //------- KEYBOARD SHORTCUTS -------
@@ -26,9 +26,11 @@ export function setupKeyboardShortcuts() {
       e: "eraser",
       g: "bucket",
       i: "eyedropper",
+      l: "lasso",
     };
     const selectedTool = shortcuts[event.key.toLowerCase()];
     if (selectedTool) setTool(selectedTool);
+    if (event.key === "Escape") clearSelection();
     if (event.key === "[") $("#zoomOut").click();
     if (event.key === "]") $("#zoomIn").click();
   });

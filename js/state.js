@@ -33,4 +33,5 @@ export const state = {
   zoom: 1,
   drawing: false,
   lastCell: null,
+  selection: null,
 };

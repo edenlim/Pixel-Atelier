@@ -19,6 +19,15 @@ function createSnapshot() {
     width: state.width,
     height: state.height,
     pixels: state.pixels.slice(),
+    selection: cloneSelection(state.selection),
+  };
+}
+
+function cloneSelection(selection) {
+  if (!selection) return null;
+  return {
+    points: selection.points.map((point) => ({ ...point })),
+    cells: selection.cells.slice(),
   };
 }
 
@@ -26,6 +35,7 @@ function restoreSnapshot(snapshot) {
   state.width = snapshot.width;
   state.height = snapshot.height;
   state.pixels = snapshot.pixels.slice();
+  state.selection = cloneSelection(snapshot.selection);
   onRestore();
 }
 

@@ -60,6 +60,12 @@
     font-size: 14px;
   }
 
+  .import-button {
+    min-height: 46px;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
   .workspace {
     display: flex;
     flex-direction: column;
@@ -171,7 +177,7 @@
 
   .tool-list {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 6px;
     margin-top: 0;
   }
@@ -348,6 +354,12 @@
   .export-button {
     min-height: 46px;
     padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  .import-button {
+    min-height: 46px;
+    padding: 10px;
     font-size: 13px;
   }
 

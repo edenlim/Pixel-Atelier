@@ -44,6 +44,7 @@ function resizeCanvas(width, height, mode = "expand") {
   state.width = width;
   state.height = height;
   state.pixels = newPixels;
+  state.selection = null;
   updateSizeControls();
   renderCanvas();
   $("#saveStatus").textContent = "Changes saved just now";

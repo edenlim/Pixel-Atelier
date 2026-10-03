@@ -211,6 +211,26 @@ body {
   letter-spacing: 0.1px;
 }
 
+.import-button {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 9px 12px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: 600 12px var(--sans);
+  cursor: pointer;
+}
+
+.import-button:hover {
+  border-color: var(--accent);
+  background: var(--surface);
+}
+
+.import-button span {
+  margin-right: 4px;
+  font-size: 14px;
+}
+
 .export-button:hover {
   background: #41453e;
 }
@@ -307,6 +327,17 @@ body {
   color: #767a72;
   font-size: 16px;
   text-align: center;
+}
+
+.tool-button .tool-icon svg {
+  display: block;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
 }
 
 .tool-button kbd {
@@ -1538,6 +1569,7 @@ body,
 .tip-card,
 .tip-key,
 .export-button,
+.import-button,
 .text-button,
 .tip-card button,
 .swatch-color-field input,

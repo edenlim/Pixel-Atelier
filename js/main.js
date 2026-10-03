@@ -1,6 +1,7 @@
 import { setupCanvasControls } from "./controls.js";
 import { setupColors } from "./colors.js";
 import { setupExport } from "./export.js";
+import { setupImageImport } from "./image-import.js";
 import { setupKeyboardShortcuts } from "./keyboard.js";
 import { setupResizeControls } from "./resize.js";
 import { setupThemeToggle } from "./theme.js";
@@ -20,6 +21,7 @@ async function initializePixelAtelier() {
   setupTools();
   setupResizeControls();
   setupExport();
+  setupImageImport();
   setupKeyboardShortcuts();
 
   $("#changelogBtn").addEventListener("click", () => {
