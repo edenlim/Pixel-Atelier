@@ -1565,6 +1565,36 @@ body {
   line-height: 1.3;
 }
 
+.export-trim-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.export-trim-option input {
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+
+.export-trim-option span {
+  display: grid;
+  gap: 4px;
+}
+
+.export-trim-option strong {
+  font: 500 11px var(--sans);
+}
+
+.export-trim-option small {
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
 #colorFile {
   position: absolute;
   left: -1000px;

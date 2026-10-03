@@ -81,15 +81,41 @@ function renderArtworkPixels() {
   return paintedPixels;
 }
 
-export function createArtworkPNG(callback) {
+export function createArtworkPNG(callback, crop = null) {
   renderArtworkPixels();
-  artworkCanvas.toBlob(callback, "image/png");
+  if (!crop) {
+    artworkCanvas.toBlob(callback, "image/png");
+    return;
+  }
+
+  createCroppedArtworkCanvas(crop).toBlob(callback, "image/png");
 }
 
-export function getArtworkPNGDataURL() {
+export function getArtworkPNGDataURL(crop = null) {
   const paintedPixels = renderArtworkPixels();
   if (paintedPixels <= 50000) return null;
-  return artworkCanvas.toDataURL("image/png");
+  if (!crop) return artworkCanvas.toDataURL("image/png");
+
+  return createCroppedArtworkCanvas(crop).toDataURL("image/png");
+}
+
+function createCroppedArtworkCanvas(crop) {
+  const croppedCanvas = document.createElement("canvas");
+  croppedCanvas.width = crop.width;
+  croppedCanvas.height = crop.height;
+  const croppedContext = croppedCanvas.getContext("2d");
+  croppedContext.drawImage(
+    artworkCanvas,
+    crop.x,
+    crop.y,
+    crop.width,
+    crop.height,
+    0,
+    0,
+    crop.width,
+    crop.height,
+  );
+  return croppedCanvas;
 }
 
 //------- CANVAS RENDERING -------
