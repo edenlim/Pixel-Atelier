@@ -138,6 +138,14 @@
               </span>
               <span>Lasso</span><kbd>L</kbd>
             </button>
+            <button class="tool-button" data-tool="move" title="Move canvas (H)">
+              <span class="tool-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2v20m0 0 3-3m-3 3-3-3M2 12h20m0 0-3-3m3 3-3 3M12 2 9 5m3-3 3 3" />
+                </svg>
+              </span>
+              <span>Move</span><kbd>H</kbd>
+            </button>
           </div>
           <div class="brush-size-control" id="brushSizeControl">
             <label for="brushSizeInput">
@@ -217,7 +225,17 @@
               ><span class="toolbar-sep"></span
               ><button id="zoomOut" class="zoom-button" aria-label="Zoom out">
                 −</button
-              ><span id="zoomLabel" class="zoom-label">100%</span
+              ><label class="zoom-label-wrap" aria-label="Zoom percentage"
+                ><input
+                  id="zoomLabel"
+                  class="zoom-label"
+                  type="number"
+                  min="100"
+                  max="400"
+                  step="1"
+                  value="100"
+                  aria-label="Zoom percentage"
+                /><span aria-hidden="true">%</span></label
               ><button id="zoomIn" class="zoom-button" aria-label="Zoom in">
                 +</button
               ><button id="fitBtn" class="fit-button">Fit</button>
@@ -238,8 +256,9 @@
               <span class="desktop-stage-tip">
                 <span class="tip-key">⌘</span> + <span class="tip-key">Z</span>
                 to undo <span class="tip-separator">·</span> Drag to draw
+                <span class="tip-separator">·</span> Ctrl/⌘ + scroll to zoom
               </span>
-              <span class="mobile-stage-tip">Drag to draw · Pinch to zoom</span>
+              <span class="mobile-stage-tip">Drag to draw · Pinch to zoom · Move tool to pan</span>
             </div>
           </div>
           <footer class="canvas-footer">
@@ -296,7 +315,7 @@
               <span>Made by: Edenlim</span>
               <button id="changelogBtn" type="button">Changelogs</button>
             </div>
-            <span class="app-version">v0.0.3</span>
+            <span class="app-version">v0.0.4</span>
           </div>
         </aside>
       </main>

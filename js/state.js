@@ -34,6 +34,8 @@ export const state = {
   brushSize: 1,
   grid: true,
   zoom: 1,
+  panX: 0,
+  panY: 0,
   drawing: false,
   lastCell: null,
   selection: null,

@@ -156,6 +156,11 @@ function drawOpenLassoOutline(points) {
 
   context.save();
   context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  context.translate(centerX + state.panX, centerY + state.panY);
+  context.scale(state.zoom, state.zoom);
+  context.translate(-centerX, -centerY);
   context.beginPath();
   points.forEach((point, index) => {
     const x = (point.x / state.width) * rect.width;

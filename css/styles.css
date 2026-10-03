@@ -778,8 +778,36 @@ body {
 .zoom-label {
   font: 10px var(--mono);
   color: #6e716a;
-  min-width: 37px;
+  width: 36px;
+  min-width: 0;
+  padding: 0;
   text-align: center;
+  box-sizing: border-box;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.zoom-label::-webkit-inner-spin-button,
+.zoom-label::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.zoom-label-wrap {
+  display: inline-flex;
+  align-items: center;
+  color: #6e716a;
+  font: 10px var(--mono);
+  cursor: text;
+}
+
+.zoom-label:focus-visible {
+  outline: 1px solid var(--green);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .fit-button {
@@ -1657,6 +1685,7 @@ body,
 :root[data-theme="dark"] .canvas-tools,
 :root[data-theme="dark"] .zoom-button,
 :root[data-theme="dark"] .zoom-label,
+:root[data-theme="dark"] .zoom-label-wrap,
 :root[data-theme="dark"] .fit-button,
 :root[data-theme="dark"] .canvas-coordinate,
 :root[data-theme="dark"] .stage-tip,

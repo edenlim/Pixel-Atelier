@@ -21,10 +21,26 @@ export function setupKeyboardShortcuts() {
       redo();
       return;
     }
+    if (modifierPressed && ["=", "+", "Add"].includes(event.key)) {
+      event.preventDefault();
+      $("#zoomIn").click();
+      return;
+    }
+    if (modifierPressed && ["-", "_", "Subtract"].includes(event.key)) {
+      event.preventDefault();
+      $("#zoomOut").click();
+      return;
+    }
+    if (modifierPressed && event.key === "0") {
+      event.preventDefault();
+      $("#fitBtn").click();
+      return;
+    }
 
     const shortcuts = {
       b: "pencil",
       g: "bucket",
+      h: "move",
       i: "eyedropper",
       l: "lasso",
     };
