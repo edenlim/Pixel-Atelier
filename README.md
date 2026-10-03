@@ -3,10 +3,7 @@ Pixel Atelier is an online pixel art editor that allows users to create and edit
 
 ## Future Features
 1. Auto add black outlines to shapes
-2. Upload existing SVG
-3. Different saving formats
-4. Grid Snapping
-5. Mirror mode (Even up to quadrants or more)
+2. Mirror mode (Even up to quadrants or more)
 
 ## Current Features
 1. Draw and edit pixel art on a transparent canvas.
