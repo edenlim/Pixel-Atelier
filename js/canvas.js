@@ -10,6 +10,7 @@ const artworkCanvas = document.createElement("canvas");
 const artworkContext = artworkCanvas.getContext("2d");
 const pixelColorCache = new Map();
 let artworkImageData = null;
+let renderedCoordinateDimensions = "";
 
 function getPixelColor(color) {
   const cachedColor = pixelColorCache.get(color);
@@ -98,8 +99,12 @@ export function renderCanvas() {
   const pixelRatio = window.devicePixelRatio || 1;
   const paintedPixels = renderArtworkPixels();
 
-  canvas.width = Math.max(1, Math.round(rect.width * pixelRatio));
-  canvas.height = Math.max(1, Math.round(rect.height * pixelRatio));
+  const backingWidth = Math.max(1, Math.round(rect.width * pixelRatio));
+  const backingHeight = Math.max(1, Math.round(rect.height * pixelRatio));
+  if (canvas.width !== backingWidth || canvas.height !== backingHeight) {
+    canvas.width = backingWidth;
+    canvas.height = backingHeight;
+  }
   context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   context.clearRect(0, 0, rect.width, rect.height);
   context.imageSmoothingEnabled = false;
@@ -175,8 +180,11 @@ function renderPreview() {
   const size = 160;
   const pixelRatio = window.devicePixelRatio || 1;
 
-  preview.width = size * pixelRatio;
-  preview.height = size * pixelRatio;
+  const backingSize = size * pixelRatio;
+  if (preview.width !== backingSize || preview.height !== backingSize) {
+    preview.width = backingSize;
+    preview.height = backingSize;
+  }
   previewContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   previewContext.clearRect(0, 0, size, size);
   previewContext.imageSmoothingEnabled = false;
@@ -197,6 +205,9 @@ function updateCanvasInfo(paintedPixels) {
 }
 
 function drawCoordinates() {
+  const dimensions = `${state.width}x${state.height}`;
+  if (dimensions === renderedCoordinateDimensions) return;
+
   const top = $("#topCoords");
   const left = $("#leftCoords");
   const xTicks = getCoordinateTicks(state.width);
@@ -204,6 +215,7 @@ function drawCoordinates() {
 
   top.replaceChildren(...xTicks.map(createCoordinate));
   left.replaceChildren(...yTicks.map(createCoordinate));
+  renderedCoordinateDimensions = dimensions;
 }
 
 function getCoordinateTicks(size) {

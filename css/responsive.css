@@ -320,6 +320,20 @@
   }
 }
 
+@media (max-width: 520px) {
+  .topbar {
+    flex-wrap: wrap;
+    row-gap: 9px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .topbar-actions {
+    flex: 1 0 100%;
+    justify-content: flex-end;
+  }
+}
+
 @media (max-width: 460px) {
   :root {
     --mobile-gutter: 14px;
@@ -415,20 +429,6 @@
 
   .modal-actions {
     gap: 8px;
-  }
-}
-
-@media (max-width: 520px) {
-  .topbar {
-    flex-wrap: wrap;
-    row-gap: 9px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-
-  .topbar-actions {
-    flex: 1 0 100%;
-    justify-content: flex-end;
   }
 }
 

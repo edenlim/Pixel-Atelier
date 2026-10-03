@@ -1,5 +1,6 @@
 import { undo, redo } from "./history.js";
-import { clearSelection, setTool } from "./tools.js";
+import { clearSelection } from "./selection.js";
+import { setTool } from "./tools.js";
 import { $ } from "./utils.js";
 
 //------- KEYBOARD SHORTCUTS -------
