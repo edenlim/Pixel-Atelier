@@ -6,35 +6,107 @@ const context = canvas.getContext("2d");
 const preview = $("#previewCanvas");
 const previewContext = preview.getContext("2d");
 const canvasWrap = $("#canvasWrap");
+const artworkCanvas = document.createElement("canvas");
+const artworkContext = artworkCanvas.getContext("2d");
+const pixelColorCache = new Map();
+let artworkImageData = null;
+
+function getPixelColor(color) {
+  const cachedColor = pixelColorCache.get(color);
+  if (cachedColor) return cachedColor;
+
+  let channels;
+  if (color.startsWith("#")) {
+    let hex = color.slice(1);
+    if (hex.length === 3 || hex.length === 4) {
+      hex = [...hex].map((channel) => channel + channel).join("");
+    }
+    channels = [
+      Number.parseInt(hex.slice(0, 2), 16),
+      Number.parseInt(hex.slice(2, 4), 16),
+      Number.parseInt(hex.slice(4, 6), 16),
+      hex.length === 8 ? Number.parseInt(hex.slice(6, 8), 16) : 255,
+    ];
+  } else {
+    const values = color
+      .match(/^rgba?\(([^)]+)\)$/i)?.[1]
+      .split(/[\s,/]+/)
+      .filter(Boolean);
+    if (!values || values.length < 3) return [0, 0, 0, 255];
+    channels = [
+      Number(values[0]),
+      Number(values[1]),
+      Number(values[2]),
+      values[3] === undefined ? 255 : Math.round(Number(values[3]) * 255),
+    ];
+  }
+
+  if (pixelColorCache.size < 8192) pixelColorCache.set(color, channels);
+  return channels;
+}
+
+function renderArtworkPixels() {
+  if (
+    artworkCanvas.width !== state.width ||
+    artworkCanvas.height !== state.height
+  ) {
+    artworkCanvas.width = state.width;
+    artworkCanvas.height = state.height;
+    artworkImageData = artworkContext.createImageData(state.width, state.height);
+  }
+
+  const data = artworkImageData.data;
+  let paintedPixels = 0;
+  for (let index = 0; index < state.pixels.length; index += 1) {
+    const color = state.pixels[index];
+    const offset = index * 4;
+    if (!color) {
+      data[offset] = 0;
+      data[offset + 1] = 0;
+      data[offset + 2] = 0;
+      data[offset + 3] = 0;
+      continue;
+    }
+
+    const [red, green, blue, alpha] = getPixelColor(color);
+    data[offset] = red;
+    data[offset + 1] = green;
+    data[offset + 2] = blue;
+    data[offset + 3] = alpha;
+    paintedPixels += 1;
+  }
+
+  artworkContext.putImageData(artworkImageData, 0, 0);
+  return paintedPixels;
+}
+
+export function createArtworkPNG(callback) {
+  renderArtworkPixels();
+  artworkCanvas.toBlob(callback, "image/png");
+}
+
+export function getArtworkPNGDataURL() {
+  const paintedPixels = renderArtworkPixels();
+  if (paintedPixels <= 50000) return null;
+  return artworkCanvas.toDataURL("image/png");
+}
 
 //------- CANVAS RENDERING -------
 
 export function renderCanvas() {
   const rect = canvasWrap.getBoundingClientRect();
   const pixelRatio = window.devicePixelRatio || 1;
+  const paintedPixels = renderArtworkPixels();
 
   canvas.width = Math.max(1, Math.round(rect.width * pixelRatio));
   canvas.height = Math.max(1, Math.round(rect.height * pixelRatio));
   context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   context.clearRect(0, 0, rect.width, rect.height);
+  context.imageSmoothingEnabled = false;
+  context.drawImage(artworkCanvas, 0, 0, rect.width, rect.height);
 
   const cellWidth = rect.width / state.width;
   const cellHeight = rect.height / state.height;
-
-  for (let y = 0; y < state.height; y += 1) {
-    for (let x = 0; x < state.width; x += 1) {
-      const color = state.pixels[y * state.width + x];
-      if (!color) continue;
-
-      context.fillStyle = color;
-      context.fillRect(
-        x * cellWidth,
-        y * cellHeight,
-        cellWidth + 0.2,
-        cellHeight + 0.2,
-      );
-    }
-  }
 
   if (state.grid && cellWidth >= 4 && cellHeight >= 4) {
     drawGrid(rect.width, rect.height, cellWidth, cellHeight);
@@ -43,7 +115,7 @@ export function renderCanvas() {
   drawSelectionOutline(cellWidth, cellHeight);
 
   renderPreview();
-  updateCanvasInfo();
+  updateCanvasInfo(paintedPixels);
   drawCoordinates();
 }
 
@@ -102,34 +174,18 @@ function drawGrid(width, height, cellWidth, cellHeight) {
 function renderPreview() {
   const size = 160;
   const pixelRatio = window.devicePixelRatio || 1;
-  const cellWidth = size / state.width;
-  const cellHeight = size / state.height;
 
   preview.width = size * pixelRatio;
   preview.height = size * pixelRatio;
   previewContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
   previewContext.clearRect(0, 0, size, size);
-
-  for (let y = 0; y < state.height; y += 1) {
-    for (let x = 0; x < state.width; x += 1) {
-      const color = state.pixels[y * state.width + x];
-      if (!color) continue;
-
-      previewContext.fillStyle = color;
-      previewContext.fillRect(
-        x * cellWidth,
-        y * cellHeight,
-        cellWidth + 0.1,
-        cellHeight + 0.1,
-      );
-    }
-  }
+  previewContext.imageSmoothingEnabled = false;
+  previewContext.drawImage(artworkCanvas, 0, 0, size, size);
 }
 
 //------- CANVAS LABELS AND COORDINATES -------
 
-function updateCanvasInfo() {
-  const paintedPixels = state.pixels.filter((pixel) => pixel !== null).length;
+function updateCanvasInfo(paintedPixels) {
   const dimensions = `${state.width} × ${state.height}`;
 
   $("#paintedCount").textContent = paintedPixels;

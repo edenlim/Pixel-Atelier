@@ -346,6 +346,41 @@ body {
   color: #a6a69e;
 }
 
+.brush-size-control {
+  display: grid;
+  gap: 7px;
+  padding: 9px 10px 7px;
+  margin-top: 6px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface-soft);
+}
+
+.brush-size-control[hidden] {
+  display: none;
+}
+
+.brush-size-control label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-secondary);
+  font: 10px var(--sans);
+}
+
+.brush-size-control output {
+  color: var(--ink);
+  font: 10px var(--mono);
+  white-space: nowrap;
+}
+
+.brush-size-control input {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 .section-rule {
   height: 1px;
   background: var(--line);

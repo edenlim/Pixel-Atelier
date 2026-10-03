@@ -1,4 +1,4 @@
-import { state } from "./state.js";
+import { MAX_CANVAS_DIMENSION, state } from "./state.js";
 import { recordChange } from "./history.js";
 import { renderCanvas } from "./canvas.js";
 import { $, showToast } from "./utils.js";
@@ -22,10 +22,10 @@ function resizeCanvas(width, height, mode = "expand") {
     !Number.isFinite(height) ||
     width < 1 ||
     height < 1 ||
-    width > 128 ||
-    height > 128
+    width > MAX_CANVAS_DIMENSION ||
+    height > MAX_CANVAS_DIMENSION
   ) {
-    showToast("Choose dimensions between 1 and 128 pixels.");
+    showToast(`Choose dimensions between 1 and ${MAX_CANVAS_DIMENSION} pixels.`);
     return false;
   }
 
@@ -59,19 +59,96 @@ function scaleArtwork(
   newWidth,
   newHeight,
 ) {
+  if (newWidth >= oldWidth && newHeight >= oldHeight) {
+    scaleArtworkUp(
+      oldPixels,
+      oldWidth,
+      oldHeight,
+      newPixels,
+      newWidth,
+      newHeight,
+    );
+    return;
+  }
+
   for (let y = 0; y < newHeight; y += 1) {
+    const sourceTop = (y * oldHeight) / newHeight;
+    const sourceBottom = ((y + 1) * oldHeight) / newHeight;
+
+    for (let x = 0; x < newWidth; x += 1) {
+      newPixels[y * newWidth + x] = getMostCommonAreaColor(
+        oldPixels,
+        oldWidth,
+        oldHeight,
+        (x * oldWidth) / newWidth,
+        ((x + 1) * oldWidth) / newWidth,
+        sourceTop,
+        sourceBottom,
+      );
+    }
+  }
+}
+
+function scaleArtworkUp(
+  oldPixels,
+  oldWidth,
+  oldHeight,
+  newPixels,
+  newWidth,
+  newHeight,
+) {
+  for (let y = 0; y < newHeight; y += 1) {
+    const sourceY = Math.min(
+      oldHeight - 1,
+      Math.floor(((y + 0.5) * oldHeight) / newHeight),
+    );
+
     for (let x = 0; x < newWidth; x += 1) {
       const sourceX = Math.min(
         oldWidth - 1,
-        Math.floor((x * oldWidth) / newWidth),
-      );
-      const sourceY = Math.min(
-        oldHeight - 1,
-        Math.floor((y * oldHeight) / newHeight),
+        Math.floor(((x + 0.5) * oldWidth) / newWidth),
       );
       newPixels[y * newWidth + x] = oldPixels[sourceY * oldWidth + sourceX];
     }
   }
+}
+
+function getMostCommonAreaColor(
+  pixels,
+  width,
+  height,
+  left,
+  right,
+  top,
+  bottom,
+) {
+  const colors = new Map();
+  const firstX = Math.floor(left);
+  const lastX = Math.min(width, Math.ceil(right));
+  const firstY = Math.floor(top);
+  const lastY = Math.min(height, Math.ceil(bottom));
+
+  for (let y = firstY; y < lastY; y += 1) {
+    const overlapY = Math.min(bottom, y + 1) - Math.max(top, y);
+
+    for (let x = firstX; x < lastX; x += 1) {
+      const overlapX = Math.min(right, x + 1) - Math.max(left, x);
+      const color = pixels[y * width + x];
+      const area = overlapX * overlapY;
+      colors.set(color, (colors.get(color) ?? 0) + area);
+    }
+  }
+
+  let mostCommonColor = null;
+  let largestArea = -1;
+  for (const [color, area] of colors) {
+    if (area > largestArea) {
+      mostCommonColor = color;
+      largestArea = area;
+    }
+  }
+
+  return mostCommonColor;
 }
 
 function expandCanvas(
@@ -137,9 +214,15 @@ function updatePairedDimension(changedDimension) {
   if (!Number.isFinite(width) || !Number.isFinite(height)) return;
 
   if (changedDimension === "width") {
-    heightInput.value = Math.min(128, Math.max(1, Math.round(width / lockedAspectRatio)));
+    heightInput.value = Math.min(
+      MAX_CANVAS_DIMENSION,
+      Math.max(1, Math.round(width / lockedAspectRatio)),
+    );
   } else {
-    widthInput.value = Math.min(128, Math.max(1, Math.round(height * lockedAspectRatio)));
+    widthInput.value = Math.min(
+      MAX_CANVAS_DIMENSION,
+      Math.max(1, Math.round(height * lockedAspectRatio)),
+    );
   }
 }
 

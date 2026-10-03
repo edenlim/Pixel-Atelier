@@ -23,11 +23,14 @@ export function setupKeyboardShortcuts() {
 
     const shortcuts = {
       b: "pencil",
-      e: "eraser",
       g: "bucket",
       i: "eyedropper",
       l: "lasso",
     };
+    if (event.key.toLowerCase() === "e") {
+      setTool(event.shiftKey ? "eraseFill" : "eraser");
+      return;
+    }
     const selectedTool = shortcuts[event.key.toLowerCase()];
     if (selectedTool) setTool(selectedTool);
     if (event.key === "Escape") clearSelection();

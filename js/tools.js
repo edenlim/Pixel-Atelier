@@ -26,10 +26,12 @@ export function setTool(tool) {
   document.querySelectorAll(".tool-button").forEach((button) => {
     button.classList.toggle("active", button.dataset.tool === tool);
   });
+  $("#brushSizeControl").hidden = !["pencil", "eraser"].includes(tool);
 
   const cursors = {
     eyedropper: "copy",
     bucket: "cell",
+    eraseFill: "cell",
     eraser: "cell",
     pencil: "crosshair",
     lasso: "crosshair",
@@ -296,13 +298,29 @@ function drawLine(start, end, paintCell) {
 }
 
 function paintCell(x, y) {
-  const index = y * state.width + x;
-  state.pixels[index] = state.tool === "eraser" ? null : state.color;
+  const offset = Math.floor((1 - state.brushSize) / 2);
+  const replacement = state.tool === "eraser" ? null : state.color;
+
+  for (let brushY = 0; brushY < state.brushSize; brushY += 1) {
+    for (let brushX = 0; brushX < state.brushSize; brushX += 1) {
+      const targetX = x + offset + brushX;
+      const targetY = y + offset + brushY;
+      if (
+        targetX < 0 ||
+        targetX >= state.width ||
+        targetY < 0 ||
+        targetY >= state.height
+      ) {
+        continue;
+      }
+      state.pixels[targetY * state.width + targetX] = replacement;
+    }
+  }
 }
 
-function floodFill(startIndex) {
+function floodFill(startIndex, replacementColor) {
   const originalColor = state.pixels[startIndex];
-  if (originalColor === state.color) return;
+  if (originalColor === replacementColor) return;
 
   const pending = [startIndex];
   while (pending.length) {
@@ -315,7 +333,7 @@ function floodFill(startIndex) {
       continue;
     }
 
-    state.pixels[index] = state.color;
+    state.pixels[index] = replacementColor;
     const x = index % state.width;
     if (x > 0) pending.push(index - 1);
     if (x < state.width - 1) pending.push(index + 1);
@@ -364,6 +382,16 @@ function updateTouchPointer(event) {
 }
 
 export function setupTools() {
+  const brushSizeInput = $("#brushSizeInput");
+  const brushSizeValue = $("#brushSizeValue");
+
+  brushSizeInput.addEventListener("input", () => {
+    state.brushSize = Number(brushSizeInput.value);
+    brushSizeValue.value = `${state.brushSize} × ${state.brushSize} px`;
+    brushSizeValue.textContent = brushSizeValue.value;
+  });
+  setTool(state.tool);
+
   document.querySelectorAll(".tool-button").forEach((button) => {
     button.addEventListener("click", () => setTool(button.dataset.tool));
   });
@@ -399,8 +427,8 @@ export function setupTools() {
 
     recordChange();
     touchChangeInProgress = event.pointerType === "touch";
-    if (state.tool === "bucket") {
-      floodFill(cell.index);
+    if (state.tool === "bucket" || state.tool === "eraseFill") {
+      floodFill(cell.index, state.tool === "eraseFill" ? null : state.color);
       renderCanvas();
       return;
     }

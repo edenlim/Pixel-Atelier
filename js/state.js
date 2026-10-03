@@ -21,6 +21,8 @@ export const palette = [
   "#242722",
 ];
 
+export const MAX_CANVAS_DIMENSION = 2048;
+
 //------- SHARED EDITOR STATE -------
 
 export const state = {
@@ -29,6 +31,7 @@ export const state = {
   pixels: Array(16 * 16).fill(null),
   color: palette[0],
   tool: "pencil",
+  brushSize: 1,
   grid: true,
   zoom: 1,
   drawing: false,
