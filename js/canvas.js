@@ -1,5 +1,5 @@
 import { state } from "./state.js";
-import { $, formatToolName } from "./utils.js";
+import { $, clamp, formatToolName } from "./utils.js";
 
 const canvas = $("#pixelCanvas");
 const context = canvas.getContext("2d");
@@ -98,6 +98,10 @@ export function renderCanvas() {
   const rect = canvasWrap.getBoundingClientRect();
   const pixelRatio = window.devicePixelRatio || 1;
   const paintedPixels = renderArtworkPixels();
+  const maxPanX = (rect.width * (state.zoom - 1)) / 2;
+  const maxPanY = (rect.height * (state.zoom - 1)) / 2;
+  state.panX = clamp(state.panX, -maxPanX, maxPanX);
+  state.panY = clamp(state.panY, -maxPanY, maxPanY);
 
   const backingWidth = Math.max(1, Math.round(rect.width * pixelRatio));
   const backingHeight = Math.max(1, Math.round(rect.height * pixelRatio));
