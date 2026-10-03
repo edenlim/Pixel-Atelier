@@ -22,5 +22,6 @@ export function showToast(message) {
 }
 
 export function formatToolName(tool) {
-  return tool[0].toUpperCase() + tool.slice(1);
+  const readableName = tool.replace(/([a-z])([A-Z])/g, "$1 $2");
+  return readableName[0].toUpperCase() + readableName.slice(1);
 }

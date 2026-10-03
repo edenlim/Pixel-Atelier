@@ -110,6 +110,9 @@
             <button class="tool-button" data-tool="eraser" title="Eraser (E)">
               <span class="tool-icon">▱</span><span>Eraser</span><kbd>E</kbd>
             </button>
+            <button class="tool-button" data-tool="eraseFill" title="Erase fill (Shift+E)">
+              <span class="tool-icon">◨</span><span>Erase fill</span><kbd>⇧E</kbd>
+            </button>
             <button
               class="tool-button"
               data-tool="bucket"
@@ -135,6 +138,21 @@
               </span>
               <span>Lasso</span><kbd>L</kbd>
             </button>
+          </div>
+          <div class="brush-size-control" id="brushSizeControl">
+            <label for="brushSizeInput">
+              <span>Brush size</span>
+              <output id="brushSizeValue" for="brushSizeInput">1 × 1 px</output>
+            </label>
+            <input
+              id="brushSizeInput"
+              type="range"
+              min="1"
+              max="32"
+              value="1"
+              step="1"
+              aria-label="Square brush size"
+            />
           </div>
 
           <div class="section-rule"></div>

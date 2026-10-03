@@ -1,7 +1,8 @@
-import { state } from "./state.js";
+import { MAX_CANVAS_DIMENSION, state } from "./state.js";
 import { recordChange } from "./history.js";
 import { renderCanvas } from "./canvas.js";
 import { $, showToast } from "./utils.js";
+import { createResizedPixels } from "./resize-algorithms.js";
 
 //------- DIMENSION DISPLAY -------
 
@@ -22,23 +23,24 @@ function resizeCanvas(width, height, mode = "expand") {
     !Number.isFinite(height) ||
     width < 1 ||
     height < 1 ||
-    width > 128 ||
-    height > 128
+    width > MAX_CANVAS_DIMENSION ||
+    height > MAX_CANVAS_DIMENSION
   ) {
-    showToast("Choose dimensions between 1 and 128 pixels.");
+    showToast(`Choose dimensions between 1 and ${MAX_CANVAS_DIMENSION} pixels.`);
     return false;
   }
 
   const oldWidth = state.width;
   const oldHeight = state.height;
   const oldPixels = state.pixels.slice();
-  const newPixels = Array(width * height).fill(null);
-
-  if (mode === "scale") {
-    scaleArtwork(oldPixels, oldWidth, oldHeight, newPixels, width, height);
-  } else {
-    expandCanvas(oldPixels, oldWidth, oldHeight, newPixels, width, height);
-  }
+  const newPixels = createResizedPixels(
+    oldPixels,
+    oldWidth,
+    oldHeight,
+    width,
+    height,
+    mode,
+  );
 
   recordChange();
   state.width = width;
@@ -49,57 +51,6 @@ function resizeCanvas(width, height, mode = "expand") {
   renderCanvas();
   $("#saveStatus").textContent = "Changes saved just now";
   return true;
-}
-
-function scaleArtwork(
-  oldPixels,
-  oldWidth,
-  oldHeight,
-  newPixels,
-  newWidth,
-  newHeight,
-) {
-  for (let y = 0; y < newHeight; y += 1) {
-    for (let x = 0; x < newWidth; x += 1) {
-      const sourceX = Math.min(
-        oldWidth - 1,
-        Math.floor((x * oldWidth) / newWidth),
-      );
-      const sourceY = Math.min(
-        oldHeight - 1,
-        Math.floor((y * oldHeight) / newHeight),
-      );
-      newPixels[y * newWidth + x] = oldPixels[sourceY * oldWidth + sourceX];
-    }
-  }
-}
-
-function expandCanvas(
-  oldPixels,
-  oldWidth,
-  oldHeight,
-  newPixels,
-  newWidth,
-  newHeight,
-) {
-  const offsetX = Math.floor((newWidth - oldWidth) / 2);
-  const offsetY = Math.floor((newHeight - oldHeight) / 2);
-
-  for (let y = 0; y < oldHeight; y += 1) {
-    for (let x = 0; x < oldWidth; x += 1) {
-      const targetX = x + offsetX;
-      const targetY = y + offsetY;
-      if (
-        targetX < 0 ||
-        targetX >= newWidth ||
-        targetY < 0 ||
-        targetY >= newHeight
-      ) {
-        continue;
-      }
-      newPixels[targetY * newWidth + targetX] = oldPixels[y * oldWidth + x];
-    }
-  }
 }
 
 //------- RESIZE DIALOG -------
@@ -137,9 +88,15 @@ function updatePairedDimension(changedDimension) {
   if (!Number.isFinite(width) || !Number.isFinite(height)) return;
 
   if (changedDimension === "width") {
-    heightInput.value = Math.min(128, Math.max(1, Math.round(width / lockedAspectRatio)));
+    heightInput.value = Math.min(
+      MAX_CANVAS_DIMENSION,
+      Math.max(1, Math.round(width / lockedAspectRatio)),
+    );
   } else {
-    widthInput.value = Math.min(128, Math.max(1, Math.round(height * lockedAspectRatio)));
+    widthInput.value = Math.min(
+      MAX_CANVAS_DIMENSION,
+      Math.max(1, Math.round(height * lockedAspectRatio)),
+    );
   }
 }
 

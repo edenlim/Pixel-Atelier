@@ -1,5 +1,6 @@
 import { undo, redo } from "./history.js";
-import { clearSelection, setTool } from "./tools.js";
+import { clearSelection } from "./selection.js";
+import { setTool } from "./tools.js";
 import { $ } from "./utils.js";
 
 //------- KEYBOARD SHORTCUTS -------
@@ -23,11 +24,14 @@ export function setupKeyboardShortcuts() {
 
     const shortcuts = {
       b: "pencil",
-      e: "eraser",
       g: "bucket",
       i: "eyedropper",
       l: "lasso",
     };
+    if (event.key.toLowerCase() === "e") {
+      setTool(event.shiftKey ? "eraseFill" : "eraser");
+      return;
+    }
     const selectedTool = shortcuts[event.key.toLowerCase()];
     if (selectedTool) setTool(selectedTool);
     if (event.key === "Escape") clearSelection();

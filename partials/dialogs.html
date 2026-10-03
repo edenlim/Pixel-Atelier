@@ -10,9 +10,9 @@
   <label class="modal-field">
     New dimensions
     <span class="input-pair">
-      <input id="widthInput" type="number" min="1" max="128" value="32" aria-label="New width" />
+      <input id="widthInput" type="number" min="1" max="2048" value="32" aria-label="New width" />
       <b>×</b>
-      <input id="heightInput" type="number" min="1" max="128" value="32" aria-label="New height" />
+      <input id="heightInput" type="number" min="1" max="2048" value="32" aria-label="New height" />
       <button id="aspectRatioLock" class="aspect-ratio-lock is-locked" type="button" aria-label="Unlock aspect ratio"
         aria-pressed="true" title="Unlock aspect ratio">
         <svg class="lock-icon lock-icon-closed" viewBox="0 0 24 24" aria-hidden="true">
@@ -69,14 +69,14 @@
   <div class="modal-kicker"><span>CANVAS SETTINGS</span><span>✳</span></div>
   <h2>Set your <em>canvas.</em></h2>
   <p class="modal-description">
-    Choose any dimensions from 1 to 128 pixels.
+    Choose any dimensions from 1 to 2048 pixels.
   </p>
   <label class="modal-field">
     Dimensions
     <span class="input-pair">
-      <input id="customWidth" type="number" min="1" max="128" value="16" aria-label="Canvas width" />
+      <input id="customWidth" type="number" min="1" max="2048" value="16" aria-label="Canvas width" />
       <b>×</b>
-      <input id="customHeight" type="number" min="1" max="128" value="16" aria-label="Canvas height" />
+      <input id="customHeight" type="number" min="1" max="2048" value="16" aria-label="Canvas height" />
     </span>
   </label>
   <div class="modal-actions">
@@ -129,7 +129,7 @@
   </fieldset>
   <div class="modal-hint">
     <span>✦</span>
-    <span id="exportHint">SVG stays sharp at any size and keeps empty pixels transparent.</span>
+    <span id="exportHint">SVG preserves transparency; dense artwork is embedded as an image to keep files manageable.</span>
   </div>
   <div class="modal-actions">
     <button type="button" class="apply-button" id="confirmExport">Download <span>↓</span></button>

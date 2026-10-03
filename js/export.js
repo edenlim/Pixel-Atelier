@@ -1,4 +1,5 @@
 import { state } from "./state.js";
+import { createArtworkPNG, getArtworkPNGDataURL } from "./canvas.js";
 import { $, showToast } from "./utils.js";
 
 //------- EXPORT FILE NAMING -------
@@ -15,6 +16,11 @@ function makeFileName() {
 //------- SVG GENERATION -------
 
 function createSVG() {
+  const artworkPNG = getArtworkPNGDataURL();
+  if (artworkPNG) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${state.width}" height="${state.height}" viewBox="0 0 ${state.width} ${state.height}"><image width="${state.width}" height="${state.height}" href="${artworkPNG}"/></svg>\n`;
+  }
+
   const colorGroups = new Map();
 
   for (let y = 0; y < state.height; y += 1) {
@@ -39,28 +45,6 @@ function createSVG() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${state.width}" height="${state.height}" viewBox="0 0 ${state.width} ${state.height}" shape-rendering="crispEdges">\n${groups}\n</svg>\n`;
 }
 
-//------- PNG GENERATION -------
-
-function createPNG(callback) {
-  const canvas = document.createElement("canvas");
-  canvas.width = state.width;
-  canvas.height = state.height;
-
-  const context = canvas.getContext("2d");
-  context.clearRect(0, 0, state.width, state.height);
-
-  for (let y = 0; y < state.height; y += 1) {
-    for (let x = 0; x < state.width; x += 1) {
-      const color = state.pixels[y * state.width + x];
-      if (!color) continue;
-      context.fillStyle = color;
-      context.fillRect(x, y, 1, 1);
-    }
-  }
-
-  canvas.toBlob(callback, "image/png");
-}
-
 //------- FILE DOWNLOAD -------
 
 function downloadFile(file, extension, message) {
@@ -82,7 +66,7 @@ function downloadFile(file, extension, message) {
 
 function exportArtwork(format) {
   if (format === "png") {
-    createPNG((file) =>
+    createArtworkPNG((file) =>
       downloadFile(file, "png", "PNG exported with a transparent background."),
     );
     return;
@@ -104,7 +88,7 @@ export function setupExport() {
     exportHint.textContent =
       format === "png"
         ? "PNG downloads at your canvas size and keeps empty pixels transparent."
-        : "SVG stays sharp at any size and keeps empty pixels transparent.";
+        : "SVG preserves transparency; dense artwork is embedded as an image to keep files manageable.";
   }
 
   formatOptions.forEach((option) => {

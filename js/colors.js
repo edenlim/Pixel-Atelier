@@ -1,9 +1,12 @@
 import { palette, state } from "./state.js";
 import { $ } from "./utils.js";
+import {
+  loadLegacyCustomColors,
+  loadSavedPalette,
+  savePalette,
+} from "./palette-storage.js";
 
 const swatches = $("#swatches");
-const paletteStorageKey = "pixel-atelier-palette";
-const legacyStorageKey = "pixel-atelier-custom-swatches";
 const selectedSwatches = new Set();
 let addSwatchButton;
 let paletteAction;
@@ -32,10 +35,10 @@ export function setColor(color) {
 export function setupColors() {
   paletteAction = $("#paletteAction");
 
-  const savedPalette = getSavedPalette();
+  const savedPalette = loadSavedPalette();
   const startingColors = savedPalette ?? [
     ...palette,
-    ...getLegacyCustomColors(),
+    ...loadLegacyCustomColors(),
   ];
 
   startingColors.forEach((color, index) => {
@@ -61,7 +64,7 @@ export function setupColors() {
     ? state.color
     : (fallbackSwatch?.dataset.color ?? state.color);
   setColor(startingColor);
-  savePalette();
+  saveCurrentPalette();
 }
 
 //------- SWATCH CREATION -------
@@ -132,7 +135,7 @@ function setupAddSwatchDialog() {
   $("#confirmColor").addEventListener("click", () => {
     const color = colorPicker.value.toLowerCase();
     const swatch = addSwatch(color, { isCustom: true, isRemovable: true });
-    savePalette();
+    saveCurrentPalette();
     setColor(color);
     exitEditMode();
     dialog.close();
@@ -331,7 +334,7 @@ function finishDragging(event) {
   paletteAction.classList.remove("drop-target");
 }
 
-//------- SWATCH REMOVAL AND STORAGE -------
+//------- SWATCH REMOVAL -------
 
 function removeSelectedSwatches() {
   const removingCurrentColor = selectedSwatches.has(state.color);
@@ -342,7 +345,7 @@ function removeSelectedSwatches() {
       if (selectedSwatches.has(swatch.dataset.color)) swatch.remove();
     });
 
-  savePalette();
+  saveCurrentPalette();
   if (removingCurrentColor) {
     const nextSwatch = swatches.querySelector(".swatch[data-color]");
     if (nextSwatch) setColor(nextSwatch.dataset.color);
@@ -350,42 +353,11 @@ function removeSelectedSwatches() {
   exitEditMode();
 }
 
-function getSavedPalette() {
-  try {
-    const saved = localStorage.getItem(paletteStorageKey);
-    if (saved === null) return null;
+//------- PALETTE STORAGE ADAPTER -------
 
-    const colors = JSON.parse(saved);
-    if (!Array.isArray(colors)) return null;
-    return colors.filter((color) => isValidColor(color));
-  } catch {
-    return null;
-  }
-}
-
-function getLegacyCustomColors() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(legacyStorageKey) || "[]");
-    return Array.isArray(saved)
-      ? saved.filter((color) => isValidColor(color))
-      : [];
-  } catch {
-    return [];
-  }
-}
-
-function isValidColor(color) {
-  return typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color);
-}
-
-function savePalette() {
+function saveCurrentPalette() {
   const colors = [...swatches.querySelectorAll(".swatch[data-color]")].map(
     (swatch) => swatch.dataset.color,
   );
-
-  try {
-    localStorage.setItem(paletteStorageKey, JSON.stringify(colors));
-  } catch {
-    // The palette still works for this session if browser storage is unavailable.
-  }
+  savePalette(colors);
 }
